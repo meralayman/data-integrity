@@ -206,7 +206,22 @@ def delete_product(product_id):
     conn.close()
 
     return jsonify({"message": "Product deleted"}), 200
+@app.route('/products/<int:product_id>', methods=['GET'])
+@jwt_required()
+def get_product(product_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
+    product = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not product:
+        return jsonify({"message": "Product not found"}), 404
+
+    return jsonify(product), 200
 
 # Run Flask App
 if __name__ == '__main__':
     app.run(debug=True)
+ 
